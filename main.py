@@ -2,7 +2,7 @@ import sys
 import json
 from PySide6.QtWidgets import QApplication, QWidget, QPushButton
 from PySide6.QtCore import QThread, Signal, QEvent, QTimer
-
+from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
 import subprocess
 import signal
 
@@ -10,7 +10,6 @@ import signal
 with open('info.json', 'r') as file:
     keyboard_layout_data = json.load(file)
 
-from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QSpacerItem, QSizePolicy
 
 class KeyboardWidget(QWidget):
     def __init__(self, layout):
@@ -28,11 +27,11 @@ class KeyboardWidget(QWidget):
         QPushButton {
             border: 4px solid #6D9098;
             border-radius: 6px;
-            background-color: #AFE7F3;
+            background-color: #005466;
             padding: 5px;
         }
         QPushButton:pressed {
-            background-color: #a0a0a0;
+            background-color: #91C9D5;
         }
         """
 
@@ -45,32 +44,30 @@ class KeyboardWidget(QWidget):
         pass
 
     def update_key_value(self, row, col, value):
-            key = (row, col)
-            if key in self.keys:
-                button = self.keys[key]
-                original_text = button.text().split('\n')[0]  
-                new_text = f"{original_text}\n{value}"  
-                button.setText(new_text)
-                #print(f"Updated key ({row},{col}) with value: {value}")  # Debug #print
+        key = (row, col)
+        if key in self.keys:
+            button = self.keys[key]
+            original_text = button.text().split('\n')[0]  
+            button.setText(f"{original_text}\n{value}")  
+            
+            
+            font = button.font()
+            font.setFamily("Arial")
+            font.setPointSize(10)  
+            font.setBold(True)
+            button.setFont(font)
 
-                # Update the font for the button
-                font = button.font() 
-                font.setPointSize(12) 
-                font.setBold(True)  
-                font.setFamily("Arial")  
-                button.setFont(font)
-
-                # Update the style to change text alignment and color
-                button.setStyleSheet("""
-                    QPushButton {
-                        text-align: left;
-                        padding-left: 5px;
-                        color: blue;  # Change the text color to blue
-                    }
-                    QPushButton:pressed {
-                        background-color: #a0a0a0;
-                    }
-                """)
+            button.setStyleSheet("QPushButton {"
+                                "border: 4px solid #6D9098;"
+                                "border-radius: 6px;"
+                                "background-color: #005466;"
+                                "padding: 5px;"
+                                "color: #91C9D5;"  # Set text color
+                                "font-size: 12px;"  
+                                "}"
+                                "QPushButton:pressed {"
+                                "background-color: #a0a0a0;"
+                                "}")
 
 
 
