@@ -18,13 +18,12 @@ class KeyButton(QPushButton):
         self.fill_color = QColor("#91C9D5")  
 
     def set_rescale_value(self, value):
-       
-        self.rescale_value = value.strip()
+        self.rescale_value = str(value).strip()
         self.update()  
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)  
+        painter.setRenderHint(QPainter.Antialiasing) 
         
         fill_path = QPainterPath()
         fill_height = (float(self.rescale_value) / 100.0) * self.height()
