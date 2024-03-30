@@ -14,51 +14,51 @@ with open('info.json', 'r') as file:
 class KeyButton(QPushButton):
     def __init__(self, label, parent=None):
         super().__init__(label, parent)
-        self.rescale_value = "0"  # Initialize rescale value to "0" as a string
-        self.fill_color = QColor("#91C9D5")  # Define the fill color here
+        self.rescale_value = "0"  
+        self.fill_color = QColor("#91C9D5")  
 
     def set_rescale_value(self, value):
-        # Store only the numerical part of the rescale value as a string
+       
         self.rescale_value = value.strip()
-        self.update()  # Trigger a repaint
+        self.update()  
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)  # For smooth borders
-        # Fill rectangle
+        painter.setRenderHint(QPainter.Antialiasing)  
+        
         fill_path = QPainterPath()
         fill_height = (float(self.rescale_value) / 100.0) * self.height()
-        fill_rect = self.rect().adjusted(4, self.height() - fill_height + 4, -4, -4)  # Adjusted for border and margin
-        fill_path.addRoundedRect(fill_rect, 10, 10)  # 10px rounded corners
+        fill_rect = self.rect().adjusted(4, self.height() - fill_height + 4, -4, -4)  
+        fill_path.addRoundedRect(fill_rect, 10, 10)  
         painter.fillPath(fill_path, self.fill_color)
 
-        # Border rectangle
+        
         border_path = QPainterPath()
-        border_path.addRoundedRect(self.rect().adjusted(2, 2, -2, -2), 10, 10)  # Slightly smaller rect for border
-        pen = QPen(QColor("#6D9098"), 2)  # Border color and width
+        border_path.addRoundedRect(self.rect().adjusted(2, 2, -2, -2), 10, 10)  
+        pen = QPen(QColor("#6D9098"), 2) 
         painter.setPen(pen)
         painter.drawPath(border_path)
 
-        # Set font for the text
+        
         font = QFont("Arial", 10, QFont.Bold)
         painter.setFont(font)
-        painter.setPen(QColor("#000000"))  # Text color
+        painter.setPen(QColor("#000000"))  
 
-        # Draw the text
+       
         text = self.text().split('\n')[0]  # Only the label, ignore rescale value
-        text_rect = self.rect().adjusted(5, 5, -5, -5)  # Adjusted to not overlap with borders
+        text_rect = self.rect().adjusted(5, 5, -5, -5)  
         painter.drawText(text_rect, Qt.AlignLeft | Qt.AlignTop, text)
 
-        font.setPointSize(14)  # Larger font size for the rescale value
+        font.setPointSize(14)  
         painter.setFont(font)
-        painter.setPen(QColor("#000000"))  # Black color for the rescale value text
+        painter.setPen(QColor("#000000")) 
 
-        # Calculate the position for the rescale value text
+        
         rescale_text_rect = QRectF(0, self.height() - fill_height, self.width(), fill_height)
-        # Draw the rescale value text aligned to the center of the fill rectangle
+        
         painter.drawText(rescale_text_rect, Qt.AlignCenter, self.rescale_value)
 
-        painter.end()  # End the painter
+        painter.end()  
 
 class KeyboardWidget(QWidget):
     def __init__(self, layout):
@@ -89,7 +89,7 @@ class KeyboardWidget(QWidget):
 
 
     def key_pressed(self, key):
-        # Handle key press event, not sure what for yet
+        #key press event, not sure what for yet
         pass
         
     def update_key_value(self, row, col, value):
@@ -98,32 +98,6 @@ class KeyboardWidget(QWidget):
             button = self.keys[key]
             # Update the rescale value using the new method
             button.set_rescale_value(value)
-    #def update_key_value(self, row, col, value):
-    #    key = (row, col)
-    #    if key in self.keys:
-    #        button = self.keys[key]
-    #        original_text = button.text().split('\n')[0]  
-    #        button.setText(f"{original_text}\n{value}")  
-            
-            
-    #        font = button.font()
-    #        font.setFamily("Arial")
-    #        font.setPointSize(10)  
-    #        font.setBold(True)
-    #        button.setFont(font)
-
-    #        button.setStyleSheet("QPushButton {"
-    #                            "border: 4px solid #6D9098;"
-    #                            "border-radius: 6px;"
-    #                            "background-color: #005466;"
-    #                            "padding: 5px;"
-    #                            "color: #91C9D5;"  # Set text color
-    #                            "font-size: 12px;"  
-    #                            "}"
-    #                            "QPushButton:pressed {"
-    #                            "background-color: #a0a0a0;"
-    #                            "}")
-
 
 
     def resizeEvent(self, event):
@@ -219,10 +193,9 @@ class MainWindow(QWidget):
                     if 'Rescale:' in part:
                         sensor_info = part.strip()
                         coords, rescale_value = sensor_info.split('Rescale:')
-                        # Correctly split and strip parentheses and spaces before conversion
                         row, col = coords.replace('(', '').replace(')', '').split(',')
-                        row, col = int(row.strip()), int(col.strip())  # Convert to integers
-                        rescale_value = rescale_value.strip()  # Strip any leading/trailing spaces
+                        row, col = int(row.strip()), int(col.strip()) 
+                        rescale_value = rescale_value.strip()  
 
                         self.keyboard_widget.update_key_value(row, col, rescale_value)
             except Exception as e:
@@ -246,7 +219,7 @@ if __name__ == "__main__":
 
     timer = QTimer()
     timer.start(500)  # ms
-    timer.timeout.connect(lambda: None)  # Timeout handler does nothing
+    timer.timeout.connect(lambda: None)  
 
 
     with open('.\\info.json', 'r') as f:

@@ -8,3 +8,7 @@ Dependencies
 PySide6
 
 ```pip install PySide6```
+
+Credits:
+
+https://github.com/PaulStoffregen/hid_listen for the hid_listen binaries 
