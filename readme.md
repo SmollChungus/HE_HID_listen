@@ -1,10 +1,11 @@
-Small python GUI that listens to QMK console HE data over HID via hid_listen
+Small python GUI for custom hall-effect keyboards. It takes a QMK info.json, listens to QMK console hall-effect sensor data over HID via the hid_listen executable.
 
 Listening to hid in format:
 ```| ($row, $col) Rescale: $value |```
 
 Dependencies
 
+Python3
 PySide6
 
 ```pip install PySide6```
