@@ -15,7 +15,7 @@ class KeyButton(QPushButton):
     def __init__(self, label, parent=None):
         super().__init__(label, parent)
         self.rescale_value = "0"  
-        self.fill_color = QColor("#91C9D5")  
+        self.fill_color = QColor("#7FE8FF")  
 
     def set_rescale_value(self, value):
         self.rescale_value = str(value).strip()
@@ -58,6 +58,10 @@ class KeyButton(QPushButton):
         painter.drawText(rescale_text_rect, Qt.AlignCenter, self.rescale_value)
 
         painter.end()  
+    
+    def set_fill_color(self, color):
+        self.fill_color = QColor(color)
+        self.update()
 
 class KeyboardWidget(QWidget):
     def __init__(self, layout):
@@ -68,6 +72,8 @@ class KeyboardWidget(QWidget):
         self.total_units = max(key_info['x'] + key_info.get('w', 1) for key_info in layout)
         #print(f"Total units: {self.total_units}")  
         self.keys = {tuple(key_info['matrix']): KeyButton(key_info['label']) for key_info in layout}
+        self.label_to_matrix = {key_info['label']: tuple(key_info['matrix']) for key_info in layout}
+
         for key, button in self.keys.items():
             button.setParent(self)
             button.clicked.connect(lambda key=key: self.key_pressed(key))
@@ -152,6 +158,9 @@ class MainWindow(QWidget):
         # Install the event filter to intercept resize events
         self.installEventFilter(self)
 
+        self.setFocusPolicy(Qt.StrongFocus)  # Allow the window to be focused
+
+
     def init_size(self):
         initial_width = 800
         initial_height = initial_width / self.aspect_ratio
@@ -178,11 +187,42 @@ class MainWindow(QWidget):
         # Call superclss for proper event handling
         super().resizeEvent(event)
 
+    def keyPressEvent(self, event):
+        # Get the character of the key that was pressed
+        char = event.text()
+
+        # Use the character to get the matrix position from the label_to_matrix mapping
+        matrix_pos = self.keyboard_widget.label_to_matrix.get(char.lower())
+
+        # If a mapping was found, change the color of the corresponding KeyButton
+        if matrix_pos:
+            self.change_key_color(*matrix_pos, "#FF7F7F")  # Change color to red
+            event.accept()  # Mark the event as handled
+        else:
+            super().keyPressEvent(event)  # Call the base class handler for other keys
+
+    def keyReleaseEvent(self, event):
+        # Get the character of the key that was released
+        char = event.text()
+
+        # Use the character to get the matrix position from the label_to_matrix mapping
+        matrix_pos = self.keyboard_widget.label_to_matrix.get(char.lower())
+
+        # If a mapping was found, change the color of the corresponding KeyButton back to blue
+        if matrix_pos:
+            self.change_key_color(*matrix_pos, "#7FE8FF")  # Change color back to blue
+            event.accept()  # Mark the event as handled
+        else:
+            super().keyReleaseEvent(event)  # Call the base class handler for other keys
+
+    def change_key_color(self, row, col, color):
+        key_button = self.keyboard_widget.keys.get((row, col))
+        if key_button:
+            key_button.set_fill_color(color)
 
     def process_hid_output(self, output):
         if 'Rescale:' in output:
             try:
-                # Split the line by '|' if necessary or directly process the output
                 if '|' in output:
                     parts = output.split('|')
                 else:
@@ -194,11 +234,14 @@ class MainWindow(QWidget):
                         coords, rescale_value = sensor_info.split('Rescale:')
                         row, col = coords.replace('(', '').replace(')', '').split(',')
                         row, col = int(row.strip()), int(col.strip()) 
-                        rescale_value = rescale_value.strip()  
+                        rescale_value = rescale_value.strip()
 
+                        # Update the rescale value using the new method
                         self.keyboard_widget.update_key_value(row, col, rescale_value)
+                        
             except Exception as e:
                 print(f"Error parsing HID output: {e}")
+
 
 
     def closeEvent(self, event):
